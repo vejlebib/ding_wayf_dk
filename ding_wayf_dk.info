@@ -1,5 +1,5 @@
 name = Ding WAYF (DK)
-description = Implementation of login with WAYF DK (nemlog-in).
+description = Implementation of WAYF support in ding2 (wayf.dk).
 core = 7.x
 package = Ding!
 dependencies[] = wayf_dk_login

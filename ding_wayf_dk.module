@@ -1,0 +1,5 @@
+<?php
+/**
+ * @file
+ * This module is a support module to share function between it's sub-modules.
+ */
