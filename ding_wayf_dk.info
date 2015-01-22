@@ -1,0 +1,7 @@
+name = Ding WAYF (DK)
+description = Implementation of login with WAYF DK (nemlog-in).
+core = 7.x
+package = Ding!
+dependencies[] = wayf_dk_login
+dependencies[] = ding_provider
+dependencies[] = ding_user
