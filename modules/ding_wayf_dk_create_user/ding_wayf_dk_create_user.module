@@ -1,0 +1,153 @@
+<?php
+/**
+ * @file
+ * Handles user creation in the provider with information from WAYF login.
+ */
+
+/**
+ * Implements hook_permission().
+ */
+function ding_wayf_dk_create_user_permission() {
+  return array(
+    'administer wayf user creation' => array(
+      'title' => t('Administer WAYF (user creation)'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function ding_wayf_dk_create_user_menu() {
+  $items = array();
+
+  $items['wayf/info/create-user-page'] = array(
+    'title' => 'Create new user',
+    'description' => 'Create new user using WAYF login.',
+    'page callback' => 'ding_wayf_dk_create_user_info_page',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function ding_wayf_dk_create_user_ctools_plugin_directory($owner, $plugin_type) {
+  return 'plugins/' . $plugin_type;
+}
+
+/**
+ * Implements hook_form_wayf_dk_login__settings_form_alter();
+ */
+function ding_wayf_dk_create_user_form_wayf_dk_login__settings_form_alter(&$form, &$form_state, $form_id) {
+  $form['user'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Create user'),
+    '#group' => 'tabs',
+  );
+
+  // Define before create info page
+  $form['user']['ding_wayf_user_create_before_info'] = array(
+    '#type' => 'fieldset',
+    '#tree' => TRUE,
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#title' => t('User creating info pager (before)'),
+    '#description' => t('Information to display on the page displayed when the user clicks on the create user link.'),
+  );
+
+  $defaults = variable_get('ding_wayf_user_create_before_info', array());
+  $form['user']['ding_wayf_user_create_before_info']['title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title'),
+    '#default_value' => isset($defaults['title']) ? $defaults['title'] : '',
+  );
+
+  $form['user']['ding_wayf_user_create_before_info']['content'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Content'),
+    '#default_value' => isset($defaults['content']) ? $defaults['content'] : '',
+  );
+
+  // Accepting text.
+  $form['user']['ding_wayf_user_create_accpect_text'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Accept text'),
+    '#default_value' => variable_get('ding_wayf_user_create_accpect_text', ''),
+    '#description' => t('The text that is display next to the user create accept check box.'),
+  );
+
+  // Define after create info page
+  $form['user']['ding_wayf_user_create_after_info'] = array(
+    '#type' => 'fieldset',
+    '#tree' => TRUE,
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#title' => t('User creating info pager (after)'),
+    '#description' => t('Information to display on the page displayed when the user have sent a creation request.'),
+  );
+
+  $defaults = variable_get('ding_wayf_user_create_after_info', array());
+  $form['user']['ding_wayf_user_create_after_info']['title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title'),
+    '#default_value' => isset($defaults['title']) ? $defaults['title'] : '',
+  );
+
+  $form['user']['ding_wayf_user_create_after_info']['content'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Content'),
+    '#default_value' => isset($defaults['content']) ? $defaults['content'] : '',
+  );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function ding_wayf_dk_create_user_theme($existing, $type, $theme, $path) {
+  return array(
+    'ding_wayf_dk_info_page' => array(
+      'template' => 'ding-wayf-dk-info-page',
+      'variables' => array(
+        'title' => array(),
+        'content' => array(),
+      ),
+      'path' => $path . '/templates',
+    ),
+  );
+}
+
+/**
+ * Menu callback for information page before user creation.
+ */
+function ding_wayf_dk_create_user_info_page() {
+  return array(
+    '#theme' => 'ding_wayf_dk_info_page',
+    '#title' => 'TEST',
+    '#content' => '<div><h1>Non equidem invideo, miror magis posuere velit aliquet</h1>
+          <p>
+            <span>Tityre, tu patulae recubans sub tegmine fagi  dolor.</span>
+            <span>Ambitioni dedisse scripsisse iudicaretur.</span> <span>Paullum deliquit, ponderibus modulisque suis ratio utitur.</span>
+            <span>Pellentesque habitant morbi tristique senectus et netus.</span><br><span>Mercedem aut nummos unde unde extricat, amaras.</span>
+            <span>Cras mattis iudicium purus sit amet fermentum.</span> <span>Morbi fringilla convallis sapien, id pulvinar odio volutpat.</span>
+            <span>Petierunt uti sibi concilium totius Galliae in diem certam indicere.</span>
+            <span>Unam incolunt Belgae, aliam Aquitani, tertiam.</span><br><span>Integer legentibus erat a ante historiarum dapibus.</span>
+            <span>Morbi odio eros, volutpat ut pharetra vitae, lobortis sed nibh.</span>
+            <span>Unam incolunt Belgae, aliam Aquitani, tertiam.</span> <span>Quis aute iure reprehenderit in voluptate velit esse.</span>
+            <span>Morbi fringilla convallis sapien, id pulvinar odio volutpat.</span>
+            <span>Curabitur blandit tempus ardua ridiculus sed magna.</span><br><span>Salutantibus vitae elit libero, a pharetra augue.</span>
+            <span>Morbi odio eros, volutpat ut pharetra vitae, lobortis sed nibh.</span>
+            <span>Magna pars studiorum, prodita quaerimus.</span> <span>Mercedem aut nummos unde unde extricat, amaras.</span>
+            <span>Salutantibus vitae elit libero, a pharetra augue.</span><br><span>Quis aute iure reprehenderit in voluptate velit esse.</span>
+            <span>Vivamus sagittis lacus vel augue laoreet rutrum faucibus.</span>
+            <span>Quisque ut dolor gravida, placerat libero vel, euismod.</span>
+            <span>Prima luce, cum quibus mons aliud  consensu ab eo.</span>
+            <span>Quo usque tandem abutere, Catilina, patientia nostra?</span>
+            <span>Hi omnes lingua, institutis, legibus inter se differunt.</span>
+          </p>
+        </div>'
+  );
+}
