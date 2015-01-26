@@ -4,3 +4,96 @@
  * Adds support for user login through WAYF dk services.
  */
 
+/**
+ * Implements hook_permission().
+ */
+function ding_wayf_dk_login_permission() {
+  return array(
+    'administer ding wayf' => array(
+      'title' => t('Administer ding WAYF'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_wayf_dk_login_create_user().
+ */
+function ding_wayf_dk_login_wayf_dk_login_create_user($attributes) {
+  if (ding_provider_implements('wayf', 'login_credentials')) {
+    // Get credentials from the provider.
+    $credentials = ding_provider_invoke('wayf', 'login_credentials', $attributes);
+
+    // Check if CPR mapping is activated.
+    if (variable_get('ding_wayf_dk_login_debug', 0)) {
+      $credentials['name'] = variable_get('ding_wayf_dk_login_debug_cpr', '');
+    }
+
+    if (!empty($credentials)) {
+      // Set values to send with the login form.
+      $form_state = array(
+        'values' => $credentials,
+      );
+
+      // Submit login form.
+      drupal_form_submit('user_login_block', $form_state);
+      $errors = form_get_errors();
+      if (!empty($errors)) {
+        drupal_set_message(t('Something went wrong. Please try again or !url of WAYF.', array('!url' => l(t('logout'), "wayf/logout"))), 'warning');
+      }
+    }
+    else {
+      drupal_set_message(t('Something went wrong. Please try again or !url of WAYF.', array('!url' => l(t('logout'), "wayf/logout"))), 'warning');
+    }
+  }
+
+  ding_wayf_dk_redirect_user();
+}
+
+/**
+ * Helper function to redirect the user.
+ *
+ * If destination query string exists the user is redirect to it else the
+ * fallback URL given is used.
+ *
+ * @param string $fallback_url
+ *   URL used if the destination query sting is not set.
+ */
+function ding_wayf_dk_redirect_user($fallback_url = NULL) {
+  if (!empty($_REQUEST['destination'])) {
+    // We do not user drupal_get_destination here as it will set the destination
+    // if one do not exists.
+    $fallback_url = $_REQUEST['destination'];
+  }
+  else {
+    global $user;
+    $fallback_url = token_replace($fallback_url, array('user' => $user));
+  }
+
+  drupal_goto($fallback_url);
+}
+
+/**
+ * Implements hook_form_wayf_dk_login__settings_form_alter();
+ *
+ * Adds debug option to map test WAYF CPR number to a provider valid one.
+ */
+function ding_wayf_dk_form_wayf_dk_login__settings_form_alter(&$form, &$form_state, $form_id) {
+  $form['settings']['debug'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Ding WAYF debug'),
+  );
+
+  $form['settings']['debug']['ding_wayf_dk_login_debug'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable debug'),
+    '#default_value' => variable_get('ding_wayf_dk_login_debug', FALSE),
+    '#description' => t('Enable debug to do CPR mapping with WAYF test users.'),
+  );
+
+  $form['settings']['debug']['ding_wayf_dk_login_debug_cpr'] = array(
+    '#type' => 'password',
+    '#title' => t('CPR map'),
+    '#description' => t('Map student test CPR (0708741234).'),
+    '#default_value' => variable_get('ding_wayf_dk_login_debug_cpr', ''),
+  );
+}
