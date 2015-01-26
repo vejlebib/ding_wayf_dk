@@ -5,14 +5,13 @@
  */
 
 /**
- * Implements hook_permission().
+ * Implements hook_menu_alter().
+ *
+ * Allow users to logout of WAYF as they may be logged into WAYF but not the
+ * drupal site/library system.
  */
-function ding_wayf_dk_login_permission() {
-  return array(
-    'administer ding wayf' => array(
-      'title' => t('Administer ding WAYF'),
-    ),
-  );
+function ding_wayf_dk_login_menu_alter($items) {
+  $items['wayf/logout']['access callback'] = TRUE;
 }
 
 /**
