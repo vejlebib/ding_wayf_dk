@@ -45,7 +45,30 @@ function ding_wayf_dk_login_wayf_dk_login_create_user($attributes) {
     }
   }
 
-  ding_wayf_dk_redirect_user();
+  ding_wayf_dk_login_redirect_user();
+}
+
+/**
+ * Implements hook_wayf_dk_login_pre_authenticate().
+ *
+ * Store destination for the current user, so redirect to e.g. page you where
+ * looking at and not always the front page.
+ */
+function ding_wayf_dk_login_wayf_dk_login_pre_authenticate() {
+  if (isset($_REQUEST['destination'])) {
+    $_SESSION['ding_wayf_dk_login_destination'] = $_REQUEST['destination'];
+  }
+}
+
+/**
+ * Implements hook_wayf_dk_login_authenticate_result_alter().
+ *
+ * Restore destination after all the WAYF redirects.
+ */
+function ding_wayf_dk_login_wayf_dk_login_authenticate_result_alter($result) {
+  if (isset($_SESSION['ding_wayf_dk_login_destination'])) {
+    $_REQUEST['destination'] = $_SESSION['ding_wayf_dk_login_destination'];
+  }
 }
 
 /**
@@ -57,7 +80,7 @@ function ding_wayf_dk_login_wayf_dk_login_create_user($attributes) {
  * @param string $fallback_url
  *   URL used if the destination query sting is not set.
  */
-function ding_wayf_dk_redirect_user($fallback_url = NULL) {
+function ding_wayf_dk_login_redirect_user($fallback_url = NULL) {
   if (!empty($_REQUEST['destination'])) {
     // We do not user drupal_get_destination here as it will set the destination
     // if one do not exists.
@@ -76,7 +99,7 @@ function ding_wayf_dk_redirect_user($fallback_url = NULL) {
  *
  * Adds debug option to map test WAYF CPR number to a provider valid one.
  */
-function ding_wayf_dk_form_wayf_dk_login__settings_form_alter(&$form, &$form_state, $form_id) {
+function ding_wayf_dk_login_form_wayf_dk_login__settings_form_alter(&$form, &$form_state, $form_id) {
   $form['settings']['debug'] = array(
     '#type' => 'fieldset',
     '#title' => t('Ding WAYF debug'),

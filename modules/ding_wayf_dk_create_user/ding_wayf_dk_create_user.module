@@ -22,9 +22,17 @@ function ding_wayf_dk_create_user_menu() {
   $items = array();
 
   $items['wayf/info/create-user-page'] = array(
-    'title' => 'Create new user',
+    'title' => 'Create new user information page',
     'description' => 'Create new user using WAYF login.',
     'page callback' => 'ding_wayf_dk_create_user_info_page',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['wayf/info/create-user-notice'] = array(
+    'title' => 'User creation notice',
+    'description' => 'Notice about account creation.',
+    'page callback' => 'ding_wayf_dk_create_user_notice',
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
@@ -72,6 +80,12 @@ function ding_wayf_dk_create_user_form_wayf_dk_login__settings_form_alter(&$form
     '#default_value' => isset($defaults['content']) ? $defaults['content'] : '',
   );
 
+  $form['user']['ding_wayf_user_create_before_info']['link'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Link title'),
+    '#default_value' => isset($defaults['link']) ? $defaults['link'] : '',
+  );
+
   // Accepting text.
   $form['user']['ding_wayf_user_create_accpect_text'] = array(
     '#type' => 'textarea',
@@ -114,6 +128,7 @@ function ding_wayf_dk_create_user_theme($existing, $type, $theme, $path) {
       'variables' => array(
         'title' => array(),
         'content' => array(),
+        'link' => NULL,
       ),
       'path' => $path . '/templates',
     ),
@@ -124,30 +139,40 @@ function ding_wayf_dk_create_user_theme($existing, $type, $theme, $path) {
  * Menu callback for information page before user creation.
  */
 function ding_wayf_dk_create_user_info_page() {
+  // Get texts from the configuration.
+  $values = variable_get('ding_wayf_user_create_before_info', array());
+
   return array(
     '#theme' => 'ding_wayf_dk_info_page',
-    '#title' => 'TEST',
-    '#content' => '<div><h1>Non equidem invideo, miror magis posuere velit aliquet</h1>
-          <p>
-            <span>Tityre, tu patulae recubans sub tegmine fagi  dolor.</span>
-            <span>Ambitioni dedisse scripsisse iudicaretur.</span> <span>Paullum deliquit, ponderibus modulisque suis ratio utitur.</span>
-            <span>Pellentesque habitant morbi tristique senectus et netus.</span><br><span>Mercedem aut nummos unde unde extricat, amaras.</span>
-            <span>Cras mattis iudicium purus sit amet fermentum.</span> <span>Morbi fringilla convallis sapien, id pulvinar odio volutpat.</span>
-            <span>Petierunt uti sibi concilium totius Galliae in diem certam indicere.</span>
-            <span>Unam incolunt Belgae, aliam Aquitani, tertiam.</span><br><span>Integer legentibus erat a ante historiarum dapibus.</span>
-            <span>Morbi odio eros, volutpat ut pharetra vitae, lobortis sed nibh.</span>
-            <span>Unam incolunt Belgae, aliam Aquitani, tertiam.</span> <span>Quis aute iure reprehenderit in voluptate velit esse.</span>
-            <span>Morbi fringilla convallis sapien, id pulvinar odio volutpat.</span>
-            <span>Curabitur blandit tempus ardua ridiculus sed magna.</span><br><span>Salutantibus vitae elit libero, a pharetra augue.</span>
-            <span>Morbi odio eros, volutpat ut pharetra vitae, lobortis sed nibh.</span>
-            <span>Magna pars studiorum, prodita quaerimus.</span> <span>Mercedem aut nummos unde unde extricat, amaras.</span>
-            <span>Salutantibus vitae elit libero, a pharetra augue.</span><br><span>Quis aute iure reprehenderit in voluptate velit esse.</span>
-            <span>Vivamus sagittis lacus vel augue laoreet rutrum faucibus.</span>
-            <span>Quisque ut dolor gravida, placerat libero vel, euismod.</span>
-            <span>Prima luce, cum quibus mons aliud  consensu ab eo.</span>
-            <span>Quo usque tandem abutere, Catilina, patientia nostra?</span>
-            <span>Hi omnes lingua, institutis, legibus inter se differunt.</span>
-          </p>
-        </div>'
+    '#title' => empty($values['title']) ? t('Not configured.') : $values['title'],
+    '#content' => empty($values['content']) ? t('Please configure WAYF configuration to get content on this page under <a href="/admin/config/people/wayf">admin/config/people/wayf</a>.') : $values['content'],
+    '#link' => array(
+      '#theme' => 'link',
+      '#text' => empty($values['link']) ? t('Register as new user') : $values['link'],
+      '#path' => 'wayf/consume',
+      '#options' => array(
+        'attributes' => array(
+          'class' => array(),
+        ),
+        'query' => array(
+          'destination' => 'wayf/info/create-user-form'
+        ),
+        'html' => TRUE,
+      ),
+    ),
+  );
+}
+
+/**
+ * Menu callback for information page after user creation.
+ */
+function ding_wayf_dk_create_user_notice() {
+  // Get texts from the configuration.
+  $values = variable_get('ding_wayf_user_create_after_info', array());
+
+  return array(
+    '#theme' => 'ding_wayf_dk_info_page',
+    '#title' => empty($values['title']) ? t('Not configured.') : $values['title'],
+    '#content' => empty($values['content']) ? t('Please configure WAYF configuration to get content on this page under <a href="/admin/config/people/wayf">admin/config/people/wayf</a>.') : $values['content'],
   );
 }
