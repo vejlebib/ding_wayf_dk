@@ -261,12 +261,26 @@ function ding_wayf_dk_create_user_form() {
   return $form;
 }
 
+/**
+ * User creation form submit handler.
+ */
 function ding_wayf_dk_create_user_form_sbumit($form, &$form_state) {
   $values = $form_state['values'];
   $cpr = $_SESSION['ding_wayf_dk_create_user'];
-  ding_provider_invoke('user', 'create', $cpr, $values['pin'], $values['name'], $values['mail'], $values['branch']);
+
+  // Remove session variables used in redirects in the user creation process.
   unset($_SESSION['ding_wayf_dk_create_user']);
   unset($_SESSION['ding_wayf_dk_login_destination']);
 
+  // Try to create the user at the provider.
+  try {
+    ding_provider_invoke('user', 'create', $cpr, $values['pin'], $values['name'], $values['mail'], $values['branch']);
+  }
+  catch (Exception $exception) {
+    drupal_set_message(t('You already have an user account at the library. So we have just logged you in.'));
+    drupal_goto();
+  }
+
+  // Redirect the user to the notice page.
   $form_state['redirect'] = 'wayf/create-user/notice';
 }
