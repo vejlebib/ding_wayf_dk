@@ -23,3 +23,5 @@ projects[wayf_dk_login][patch][] = "https://www.drupal.org/files/issues/fix_inde
 projects[wayf_dk_login][patch][] = "https://www.drupal.org/files/issues/allow_other_module_to_create_users-2414173-1.patch"
 ; Giver other modules change to alter login data (https://www.drupal.org/node/2414927).
 projects[wayf_dk_login][patch][] = "https://www.drupal.org/files/issues/auth_alters-2414927-1.patch"
+; Add support for metadata export (https://www.drupal.org/node/2415975).
+projects[wayf_dk_login][patch][] = "https://www.drupal.org/files/issues/generate-sp-metadate-2415975-1.patch"
