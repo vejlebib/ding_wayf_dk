@@ -57,6 +57,11 @@ function ding_wayf_dk_login_wayf_dk_login_create_user($attributes) {
 function ding_wayf_dk_login_wayf_dk_login_pre_authenticate() {
   if (isset($_REQUEST['destination'])) {
     $_SESSION['ding_wayf_dk_login_destination'] = $_REQUEST['destination'];
+
+    // The WAYF authentication process will redirect the users browser to WAYF
+    // servers, so session will not be started. Hence we need to start the
+    // session to ensure that the destination above don't get lost in redirects.
+    drupal_session_start();
   }
 }
 

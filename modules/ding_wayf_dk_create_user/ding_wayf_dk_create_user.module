@@ -21,7 +21,7 @@ function ding_wayf_dk_create_user_permission() {
 function ding_wayf_dk_create_user_menu() {
   $items = array();
 
-  $items['wayf/info/create-user-page'] = array(
+  $items['wayf/create-user/before-page'] = array(
     'title' => 'Create new user information page',
     'description' => 'Create new user using WAYF login.',
     'page callback' => 'ding_wayf_dk_create_user_info_page',
@@ -29,10 +29,19 @@ function ding_wayf_dk_create_user_menu() {
     'type' => MENU_CALLBACK,
   );
 
-  $items['wayf/info/create-user-notice'] = array(
+  $items['wayf/create-user/notice'] = array(
     'title' => 'User creation notice',
     'description' => 'Notice about account creation.',
     'page callback' => 'ding_wayf_dk_create_user_notice',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+    $items['wayf/create-user/form'] = array(
+    'title' => 'User creation form',
+    'description' => 'Form used to account creation.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ding_wayf_dk_create_user_form'),
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
@@ -45,6 +54,20 @@ function ding_wayf_dk_create_user_menu() {
  */
 function ding_wayf_dk_create_user_ctools_plugin_directory($owner, $plugin_type) {
   return 'plugins/' . $plugin_type;
+}
+
+/**
+ * Implements hook_wayf_dk_login_authenticate_result_alter().
+ *
+ * Store the schacPersonalUniqueID in session to use later when send user create
+ * to the provider.
+ */
+function ding_wayf_dk_create_user_wayf_dk_login_authenticate_result_alter($result) {
+  if (isset($_SESSION['ding_wayf_dk_login_destination']) && $_SESSION['ding_wayf_dk_login_destination'] == 'wayf/create-user/form') {
+    // Extract unique id form the WAYF attributes (the CPR number).
+    preg_match('/\d{10}$/', reset($result['attributes']['schacPersonalUniqueID']), $uniqueID);
+    $_SESSION['ding_wayf_dk_create_user'] = reset($uniqueID);
+  }
 }
 
 /**
@@ -155,7 +178,7 @@ function ding_wayf_dk_create_user_info_page() {
           'class' => array(),
         ),
         'query' => array(
-          'destination' => 'wayf/info/create-user-form'
+          'destination' => 'wayf/create-user/form'
         ),
         'html' => TRUE,
       ),
@@ -175,4 +198,75 @@ function ding_wayf_dk_create_user_notice() {
     '#title' => empty($values['title']) ? t('Not configured.') : $values['title'],
     '#content' => empty($values['content']) ? t('Please configure WAYF configuration to get content on this page under <a href="/admin/config/people/wayf">admin/config/people/wayf</a>.') : $values['content'],
   );
+}
+
+/**
+ * Menu callback to create the user creation form.
+ */
+function ding_wayf_dk_create_user_form() {
+  // Remove all message from the normal login, that have not succeed.
+  drupal_get_messages(null, TRUE);
+
+  // This is a little hack to get around the panels design requirements of the
+  // ddbasic theme.
+  $form = array(
+    '#prefix' => '<div class="default-layout"><div class="layout-wrapper">',
+    '#suffix' => '<br /></div></div>',
+  );
+
+  $form['accept'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('I accept the user agreements'),
+    '#description' => variable_get('ding_wayf_user_create_accpect_text', ''),
+    '#required' => TRUE,
+  );
+
+  $form['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Name'),
+    '#description' => t('You full name.'),
+    '#maxlength' => 100,
+    '#required' => TRUE,
+  );
+
+  $form['mail'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Email address'),
+    '#description' => t('The Email address that we can use to get in contact with you.'),
+    '#required' => TRUE,
+  );
+
+  // Get branch options form the active provider.
+  global $user;
+  $provider = _ding_provider_get_provider('reservation');
+  $options = ding_provider_invoke('reservation', 'options', $user);
+  $form['branch'] = $options[$provider['module'] . '_preferred_branch'];
+
+  $form['pin'] = array(
+    '#type' => 'password',
+    '#title' => t('Pin code'),
+    '#description' => t('Pin code with an max lenght of %lenght', array('%lenght' => ding_user_get_pincode_length())),
+    '#size' => 10,
+    '#maxlength' => ding_user_get_pincode_length(),
+    '#required' => TRUE,
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Create me')
+  );
+
+  $form['#submit'] = array('ding_wayf_dk_create_user_form_sbumit');
+
+  return $form;
+}
+
+function ding_wayf_dk_create_user_form_sbumit($form, &$form_state) {
+  $values = $form_state['values'];
+  $cpr = $_SESSION['ding_wayf_dk_create_user'];
+  ding_provider_invoke('user', 'create', $cpr, $values['pin'], $values['name'], $values['mail'], $values['branch']);
+  unset($_SESSION['ding_wayf_dk_create_user']);
+  unset($_SESSION['ding_wayf_dk_login_destination']);
+
+  $form_state['redirect'] = 'wayf/create-user/notice';
 }

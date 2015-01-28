@@ -23,7 +23,7 @@ function ding_wayf_dk_login_create_user_content_type_render($subtype, $conf, $co
     $block->content = array(
       '#theme' => 'link',
       '#text' => t('Create user'),
-      '#path' => 'wayf/info/create-user-page',
+      '#path' => 'wayf/create-user/before-page',
       '#options' => array(
         'attributes' => array(
           'class' => array(),
