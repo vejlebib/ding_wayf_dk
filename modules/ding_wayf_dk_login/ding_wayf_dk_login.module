@@ -5,6 +5,11 @@
  */
 
 /**
+ * Delimiter for extracting a part of a field.
+ */
+define('DING_WAYF_DK_LOGIN_FIELD_DELIMITER', ':');
+
+/**
  * Implements hook_menu_alter().
  *
  * Allow users to logout of WAYF as they may be logged into WAYF but not the
@@ -20,7 +25,7 @@ function ding_wayf_dk_login_menu_alter($items) {
 function ding_wayf_dk_login_wayf_dk_login_create_user($attributes) {
   if (ding_provider_implements('wayf', 'login_credentials')) {
     // Get credentials from the provider.
-    $credentials = ding_provider_invoke('wayf', 'login_credentials', $attributes);
+    $credentials = ding_provider_invoke('wayf', 'login_credentials', ding_wayf_dk_login_get_credentials($attributes));
 
     // Check if CPR mapping is activated.
     if (variable_get('ding_wayf_dk_login_debug', 0)) {
@@ -123,4 +128,86 @@ function ding_wayf_dk_login_form_wayf_dk_login__settings_form_alter(&$form, &$fo
     '#description' => t('Map student test CPR (0708741234).'),
     '#default_value' => variable_get('ding_wayf_dk_login_debug_cpr', ''),
   );
+}
+
+/**
+ * Get user credentials from SAML attributes and the user provider.
+ *
+ * @param array $attributes
+ *   WAYF attributes.
+ *
+ * @return array
+ *   Attributes filter based on the active provider. Defaults to
+ *   'schacPersonalUniqueID' with social security number (CPR).
+ */
+function ding_wayf_dk_login_get_credentials($attributes) {
+  // Set default required attributes.
+  $required_attributes = array(
+    'schacPersonalUniqueID' => array(
+      'field' => 'CPR',
+      'authname' => TRUE,
+    ),
+  );
+
+  // Ask the provider about required attributes and give it a change to override
+  // defaults.
+  if (ding_provider_implements('wayf', 'attributes')) {
+    $required_attributes = ding_provider_invoke('wayf', 'attributes', $required_attributes);
+  }
+
+  // Filter the attributes from WAYF/SAML and only return required once.
+  return ding_wayf_dk_login_get_required_attributes($attributes, $required_attributes);
+}
+
+/**
+ * Extract required attributes from available WAYF attributes.
+ *
+ * @param array $attributes
+ *   WAYF attributes.
+ * @param array $required_attributes
+ *   Required attributes.
+ *
+ * @return array
+ *   Will be empty if not all required attributes is present.
+ */
+function ding_wayf_dk_login_get_required_attributes($attributes, $required_attributes) {
+  $attribute_list = array();
+
+  if (isset($attributes) && is_array($required_attributes)) {
+    foreach ($required_attributes as $attribute => $value) {
+      if (isset($attributes[$attribute])) {
+        $attribute_list[$attribute] = ding_wayf_dk_login_extract_data($attributes[$attribute], $value['field']);
+      }
+    }
+
+  }
+
+  return $attribute_list;
+}
+
+/**
+ * Extracts a field from a SAML attribute string.
+ *
+ * @param string $data
+ *   The attribute form the authentication provider.
+ * @param string $field
+ *   The field to extract from the string.
+ *
+ * @return string
+ *   The value of the field.
+ */
+function ding_wayf_dk_login_extract_data($data, $field = '') {
+  if (empty($field)) {
+    return $data[0];
+  }
+  else {
+    $field .= DING_WAYF_DK_LOGIN_FIELD_DELIMITER;
+
+    if (($pos = strpos($data[0], $field)) !== FALSE) {
+      return substr($data[0], $pos + strlen($field));
+    }
+    else {
+      return '';
+    }
+  }
 }
