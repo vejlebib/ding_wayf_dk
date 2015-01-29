@@ -15,7 +15,7 @@ define('DING_WAYF_DK_LOGIN_FIELD_DELIMITER', ':');
  * Allow users to logout of WAYF as they may be logged into WAYF but not the
  * drupal site/library system.
  */
-function ding_wayf_dk_login_menu_alter($items) {
+function ding_wayf_dk_login_menu_alter(&$items) {
   $items['wayf/logout']['access callback'] = TRUE;
 }
 
@@ -79,6 +79,22 @@ function ding_wayf_dk_login_wayf_dk_login_authenticate_result_alter($result) {
   if (isset($_SESSION['ding_wayf_dk_login_destination'])) {
     $_REQUEST['destination'] = $_SESSION['ding_wayf_dk_login_destination'];
   }
+}
+
+/**
+ * Implements hook_preprocess_wayf_dk_login().
+ *
+ * Change the image to Nem-id.
+ */
+function ding_wayf_dk_login_preprocess_wayf_dk_login(&$variables) {
+  $image = array(
+    '#theme' => 'image',
+    '#path' => drupal_get_path('module', 'ding_wayf_dk_login') . '/images/nemid_logo.png',
+    '#alt' => t('Login with NemID'),
+    '#title' => t('Login with NemID'),
+  );
+
+  $variables['login_url']['#text'] = drupal_render($image);
 }
 
 /**

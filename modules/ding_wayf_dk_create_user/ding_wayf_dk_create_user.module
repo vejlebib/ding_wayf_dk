@@ -155,6 +155,13 @@ function ding_wayf_dk_create_user_theme($existing, $type, $theme, $path) {
       ),
       'path' => $path . '/templates',
     ),
+    'ding_wayf_dk_create_user_link' => array(
+      'template' => 'ding-wayf-dk-create-user-link',
+      'variables' => array(
+        'link' => null,
+      ),
+      'path' => $path . '/templates',
+    ),
   );
 }
 

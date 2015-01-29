@@ -21,17 +21,17 @@ function ding_wayf_dk_login_create_user_content_type_render($subtype, $conf, $co
   // Don't show the login icon if a user is already logged in.
   if (user_is_anonymous()) {
     $block->content = array(
-      '#theme' => 'link',
-      '#text' => t('Create user'),
-      '#path' => 'wayf/create-user/before-page',
-      '#options' => array(
-        'attributes' => array(
-          'class' => array(),
+      '#theme' => 'ding_wayf_dk_create_user_link',
+      '#link' => array(
+        '#theme' => 'link',
+        '#text' => t('Create user'),
+        '#path' => 'wayf/create-user/before-page',
+        '#options' => array(
+          'attributes' => array(
+            'class' => array('create-user-link'),
+          ),
+          'html' => TRUE,
         ),
-        'query' => array(
-          drupal_get_destination(),
-        ),
-        'html' => TRUE,
       ),
     );
   }

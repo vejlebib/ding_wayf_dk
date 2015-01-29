@@ -25,3 +25,5 @@ projects[wayf_dk_login][patch][] = "https://www.drupal.org/files/issues/allow_ot
 projects[wayf_dk_login][patch][] = "https://www.drupal.org/files/issues/auth_alters-2414927-1.patch"
 ; Add support for metadata export (https://www.drupal.org/node/2415975).
 projects[wayf_dk_login][patch][] = "https://www.drupal.org/files/issues/generate-sp-metadate-2415975-1.patch"
+; Change link to use render array (https://www.drupal.org/node/2416347).
+projects[wayf_dk_login][patch][] = "https://www.drupal.org/files/issues/render-array-for-link-2416347-1.patch"
