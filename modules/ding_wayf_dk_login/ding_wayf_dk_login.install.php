@@ -27,6 +27,25 @@ function ding_wayf_dk_login_requirements($phase) {
 }
 
 /**
+ * Implements hook_install().
+ */
+function ding_wayf_dk_login_install() {
+  // Set this module to handle user login.
+  variable_set('wayf_dk_login_create_user_modules', array(
+    'ding_wayf_dk_login' => 'ding_wayf_dk_login',
+    'wayf_dk_login' => 0,
+  ));
+
+  // Enable NemID.
+  variable_set('wayf_dk_login_organizations_active', array(
+    'sikker-adgang.dk' => 'sikker-adgang.dk',
+  ));
+
+  // Set default language.
+  variable_set('wayf_dk_login_organizations_name_language', 'da');
+}
+
+/**
  * Implements hook_uninstall().
  */
 function ding_wayf_dk_login_uninstall() {
