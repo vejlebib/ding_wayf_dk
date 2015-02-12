@@ -66,6 +66,27 @@ function ding_wayf_dk_create_user_wayf_dk_login_authenticate_result_alter($resul
   if (isset($_SESSION['ding_wayf_dk_login_destination']) && $_SESSION['ding_wayf_dk_login_destination'] == 'wayf/create-user/form') {
     // Extract unique id form the WAYF attributes (the CPR number).
     preg_match('/\d{10}$/', reset($result['attributes']['schacPersonalUniqueID']), $uniqueID);
+    $uniqueID = reset($uniqueID);
+
+    // Check if age limit should be set.
+    $limit = variable_get('ding_wayf_user_create_age_limit', '');
+    if (!empty($limit) && is_numeric($limit)) {
+      // Make the time of birth as unix time.
+      $date = mktime(0, 0, 0, substr($uniqueID, 2, 2), substr($uniqueID, 0, 2), substr($uniqueID, 4, 2));
+
+      // Current day as unix time.
+      $current = mktime(0, 0, 0);
+
+      // Calculate if the limit is not reached.
+      if (($current - $date) < (365 * 24 * 60 * 60) * $limit) {
+        // The age limit has to kick in.
+        drupal_set_message('You are not allowed to automatically be created because of the age limit. Please go to your local library to registry.');
+
+        // Redirect to front page.
+        drupal_goto('<front>');
+      }
+    }
+
     $_SESSION['ding_wayf_dk_create_user'] = reset($uniqueID);
   }
 }
@@ -78,6 +99,13 @@ function ding_wayf_dk_create_user_form_wayf_dk_login__settings_form_alter(&$form
     '#type' => 'fieldset',
     '#title' => t('Create user'),
     '#group' => 'tabs',
+  );
+
+  $form['user']['ding_wayf_user_create_age_limit'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Age limit'),
+    '#description' => t('If set the CPR number will be used to set an age limit. If empty no limit exists.'),
+    '#default_value' => variable_get('ding_wayf_user_create_age_limit', ''),
   );
 
   // Define before create info page
