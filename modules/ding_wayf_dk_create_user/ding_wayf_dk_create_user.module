@@ -71,14 +71,38 @@ function ding_wayf_dk_create_user_wayf_dk_login_authenticate_result_alter($resul
     // Check if age limit should be set.
     $limit = variable_get('ding_wayf_user_create_age_limit', '');
     if (!empty($limit) && is_numeric($limit)) {
-      // Make the time of birth as unix time.
-      $date = mktime(0, 0, 0, substr($uniqueID, 2, 2), substr($uniqueID, 0, 2), substr($uniqueID, 4, 2));
 
-      // Current day as unix time.
-      $current = mktime(0, 0, 0);
+      // Magic function to get the 1900, 1800 or 2000 prefixes for year.
+      // @see http://da.wikipedia.org/wiki/CPR-nummer
+      $year = substr($uniqueID, 4, 2);
+      switch (substr($uniqueID, 6, 1)) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+          $year = '19' . $year;
+          break;
 
-      // Calculate if the limit is not reached.
-      if (($current - $date) < (365 * 24 * 60 * 60) * $limit) {
+        case 4:
+        case 9:
+          $year = $year > 36 ? '19' . $year : '20' . $year;
+          break;
+
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+          $year = $year > 57 ? '18' . $year : '20' . $year;
+          break;
+      }
+
+      // Create date time object to use it's diff method.
+      $from = new DateTime();
+      $from->setDate($year, substr($uniqueID, 2, 2), substr($uniqueID, 0, 2));
+      $to = new DateTime('tomorrow');
+
+      // Check if limit have been reached.
+      if ($from->diff($to)->y < $limit) {
         // The age limit has to kick in.
         drupal_set_message('You are not allowed to automatically be created because of the age limit. Please go to your local library to registry.');
 
