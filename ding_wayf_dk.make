@@ -27,3 +27,5 @@ projects[wayf_dk_login][patch][] = "https://www.drupal.org/files/issues/auth_alt
 projects[wayf_dk_login][patch][] = "https://www.drupal.org/files/issues/generate-sp-metadate-2415975-1.patch"
 ; Change link to use render array (https://www.drupal.org/node/2416347).
 projects[wayf_dk_login][patch][] = "https://www.drupal.org/files/issues/render-array-for-link-2416347-1.patch"
+; Add pre logout hook support (https://www.drupal.org/node/2427193).
+projects[wayf_dk_login][patch][] = "https://www.drupal.org/files/issues/pre-logout-2427193-1.patch"

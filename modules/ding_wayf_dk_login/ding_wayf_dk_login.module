@@ -71,6 +71,17 @@ function ding_wayf_dk_login_wayf_dk_login_pre_authenticate() {
 }
 
 /**
+ * Implements hook_wayf_dk_login_pre_logout().
+ *
+ * Ensures that session is cleaned up.
+ */
+function ding_wayf_dk_login_wayf_dk_login_pre_logout() {
+  if (isset($_SESSION['ding_wayf_dk_login_destination'])) {
+    unset($_SESSION['ding_wayf_dk_login_destination']);
+  }
+}
+
+/**
  * Implements hook_wayf_dk_login_authenticate_result_alter().
  *
  * Restore destination after all the WAYF redirects.
