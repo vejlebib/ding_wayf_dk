@@ -321,6 +321,21 @@ function ding_wayf_dk_create_user_form() {
 }
 
 /**
+ * Implements hook_wayf_dk_login_pre_logout().
+ *
+ * Ensures that session is cleaned up.
+ */
+function ding_wayf_dk_login_wayf_dk_login_pre_logout() {
+  if (isset($_SESSION['ding_wayf_dk_login_destination'])) {
+    unset($_SESSION['ding_wayf_dk_login_destination']);
+  }
+
+  if (isset($_SESSION['ding_wayf_dk_create_user'])) {
+    unset($_SESSION['ding_wayf_dk_create_user']);
+  }
+}
+
+/**
  * User creation form submit handler.
  */
 function ding_wayf_dk_create_user_form_sbumit($form, &$form_state) {
