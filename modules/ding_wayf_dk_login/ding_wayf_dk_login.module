@@ -105,7 +105,7 @@ function ding_wayf_dk_login_preprocess_wayf_dk_login(&$variables) {
     '#title' => t('Login with NemID'),
   );
 
-  $variables['login_url']['#text'] = drupal_render($image);
+  $variables['login_url']['#text'] = t('Login with ') . drupal_render($image);
 }
 
 /**

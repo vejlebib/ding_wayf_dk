@@ -325,7 +325,7 @@ function ding_wayf_dk_create_user_form() {
  *
  * Ensures that session is cleaned up.
  */
-function ding_wayf_dk_login_wayf_dk_login_pre_logout() {
+function ding_wayf_dk_create_user_wayf_dk_login_pre_logout() {
   if (isset($_SESSION['ding_wayf_dk_login_destination'])) {
     unset($_SESSION['ding_wayf_dk_login_destination']);
   }
