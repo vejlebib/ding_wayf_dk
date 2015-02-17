@@ -266,6 +266,19 @@ function ding_wayf_dk_create_user_form() {
   // Remove all message from the normal login, that have not succeed.
   drupal_get_messages(null, TRUE);
 
+  // Check if user have been logged in.
+  if (user_is_logged_in()) {
+    // User is logged in and have an account.
+    drupal_set_message(t('You already have an user account at the library. So we have just logged you in.'));
+
+    // Ensure session information is removed.
+    unset($_SESSION['ding_wayf_dk_create_user']);
+    unset($_SESSION['ding_wayf_dk_login_destination']);
+
+    // Send user to front page.
+    drupal_goto('<front>');
+  }
+
   // This is a little hack to get around the panels design requirements of the
   // ddbasic theme.
   $form = array(
