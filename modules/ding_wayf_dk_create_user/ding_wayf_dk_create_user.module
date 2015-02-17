@@ -111,7 +111,7 @@ function ding_wayf_dk_create_user_wayf_dk_login_authenticate_result_alter($resul
       }
     }
 
-    $_SESSION['ding_wayf_dk_create_user'] = reset($uniqueID);
+    $_SESSION['ding_wayf_dk_create_user'] = $uniqueID;
   }
 }
 
@@ -304,7 +304,7 @@ function ding_wayf_dk_create_user_form() {
   $form['pin'] = array(
     '#type' => 'password',
     '#title' => t('Pin code'),
-    '#description' => t('Pin code with an max lenght of %lenght', array('%lenght' => ding_user_get_pincode_length())),
+    '#description' => t('Pin code with an max length of %length', array('%length' => ding_user_get_pincode_length())),
     '#size' => 10,
     '#maxlength' => ding_user_get_pincode_length(),
     '#required' => TRUE,
@@ -348,13 +348,20 @@ function ding_wayf_dk_create_user_form_sbumit($form, &$form_state) {
 
   // Try to create the user at the provider.
   try {
+    // Create user.
     ding_provider_invoke('user', 'create', $cpr, $values['pin'], $values['name'], $values['mail'], $values['branch']);
+
+    // Login the user and ensure he/her is redirect to notice page.
+    $_REQUEST['destination'] = 'wayf/create-user/notice';
+    ding_wayf_dk_login_wayf_dk_login_create_user(array(
+      'schacPersonalUniqueID' => array('urn:mace:terena.org:schac:personalUniqueID:dk:CPR:' . $cpr),
+    ));
+
+    // Remove request fields for the login form.
+    drupal_get_messages(NULL, TRUE);
   }
   catch (Exception $exception) {
     drupal_set_message(t('You already have an user account at the library. So we have just logged you in.'));
     drupal_goto();
   }
-
-  // Redirect the user to the notice page.
-  $form_state['redirect'] = 'wayf/create-user/notice';
 }

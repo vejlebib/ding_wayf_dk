@@ -6,6 +6,7 @@
       <div class="create-user-link">
         <?php print render($link); ?>
       </div>
+      <p></p>
     </div>
   </div>
 </div>
