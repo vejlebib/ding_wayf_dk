@@ -42,7 +42,19 @@ function ding_wayf_dk_login_wayf_dk_login_create_user($attributes) {
       drupal_form_submit('user_login_block', $form_state);
       $errors = form_get_errors();
       if (!empty($errors)) {
-        drupal_set_message(t('Something went wrong. Please try again or !url of WAYF.', array('!url' => l(t('logout'), "wayf/logout"))), 'warning');
+        if (module_exists('ding_wayf_dk_create_user')) {
+          drupal_set_message(t('You could not be logged into the library system. You can again !url of WAYF or !user_url.', array(
+            '!url' => l(t('logout'), 'wayf/logout'),
+            '!user_url' => l(t('create a user account'), 'wayf/create-user/before-page'),
+          )), 'warning');
+        }
+        else {
+          // Clean out message from the login form.
+          drupal_get_messages(NULL, TRUE);
+
+          // Set new default message.
+          drupal_set_message(t('Something went wrong. Please try again or !url of WAYF.', array('!url' => l(t('logout'), "wayf/logout"))), 'warning');
+        }
       }
     }
     else {
