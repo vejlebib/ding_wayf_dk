@@ -286,6 +286,9 @@ function ding_wayf_dk_create_user_form() {
     '#description' => t('You full name.'),
     '#maxlength' => 100,
     '#required' => TRUE,
+    '#attributes' => array(
+      'autocomplete' => 'off',
+    ),
   );
 
   $form['mail'] = array(
@@ -293,6 +296,9 @@ function ding_wayf_dk_create_user_form() {
     '#title' => t('Email address'),
     '#description' => t('The Email address that we can use to get in contact with you.'),
     '#required' => TRUE,
+    '#attributes' => array(
+      'autocomplete' => 'off',
+    ),
   );
 
   // Get branch options form the active provider.
@@ -308,11 +314,22 @@ function ding_wayf_dk_create_user_form() {
     '#size' => 10,
     '#maxlength' => ding_user_get_pincode_length(),
     '#required' => TRUE,
+    '#attributes' => array(
+      'autocomplete' => 'off',
+    ),
   );
 
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Create me')
+  );
+
+  $link = '/wayf/logout';
+  if (user_is_logged_in()) {
+    $link = '/user/logout';
+  }
+  $form['cancel'] = array(
+    '#markup' => '<a class="ding-wayf--cancel" href="' . $link . '">' . t('Cancel') . '</a>',
   );
 
   $form['#submit'] = array('ding_wayf_dk_create_user_form_sbumit');
