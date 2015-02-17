@@ -43,6 +43,9 @@ function ding_wayf_dk_login_wayf_dk_login_create_user($attributes) {
       $errors = form_get_errors();
       if (!empty($errors)) {
         if (module_exists('ding_wayf_dk_create_user')) {
+          // Clean out message from the login form.
+          drupal_get_messages(NULL, TRUE);
+
           drupal_set_message(t('You could not be logged into the library system. You can again !url of WAYF or !user_url.', array(
             '!url' => l(t('logout'), 'wayf/logout'),
             '!user_url' => l(t('create a user account'), 'wayf/create-user/before-page'),
