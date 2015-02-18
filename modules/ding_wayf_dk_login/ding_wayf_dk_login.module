@@ -46,9 +46,9 @@ function ding_wayf_dk_login_wayf_dk_login_create_user($attributes) {
           // Clean out message from the login form.
           drupal_get_messages(NULL, TRUE);
 
-          drupal_set_message(t('You could not be logged into the library system. You can again !url of WAYF or !user_url.', array(
-            '!url' => l(t('logout'), 'wayf/logout'),
-            '!user_url' => l(t('create a user account'), 'wayf/create-user/before-page'),
+          drupal_set_message(t('You do not have an user account at the public library. If you wish to create an user account !user_url . You are still logged in at WAYF, so you can !logout to logout of WAYF.', array(
+            '!logout' => l(t('click her'), 'wayf/logout'),
+            '!user_url' => l(t('click her'), 'wayf/create-user/before-page'),
           )), 'warning');
         }
         else {
