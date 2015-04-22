@@ -30,4 +30,4 @@ projects[wayf_dk_login][patch][] = "https://www.drupal.org/files/issues/render-a
 ; Add pre logout hook support (https://www.drupal.org/node/2427193).
 projects[wayf_dk_login][patch][] = "https://www.drupal.org/files/issues/pre-logout-2427193-1.patch"
 ; Add scoping support (https://www.drupal.org/node/2428847).
-projects[wayf_dk_login][patch][] = "https://www.drupal.org/files/issues/wayf_dk_scoping_support-2428847-1.patch"
+projects[wayf_dk_login][patch][] = "https://www.drupal.org/files/issues/wayf_dk_scoping_support-2428847-2.patch"
