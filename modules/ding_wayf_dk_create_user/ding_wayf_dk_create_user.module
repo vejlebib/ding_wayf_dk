@@ -366,6 +366,18 @@ function ding_wayf_dk_create_user_wayf_dk_login_pre_logout() {
 }
 
 /**
+ * User creation form validate handler.
+ */
+function ding_wayf_dk_create_user_form_validate($form, &$form_state) {
+  if (!valid_email_address($form_state['values']['mail'])) {
+    form_set_error('mail', t('Please enter a valid email'));
+  }
+  if (!ctype_digit($form_state['values']['pin'])) {
+    form_set_error('pin', t('The pincode should only contain numbers'));
+  }
+}
+
+/**
  * User creation form submit handler.
  */
 function ding_wayf_dk_create_user_form_sbumit($form, &$form_state) {
