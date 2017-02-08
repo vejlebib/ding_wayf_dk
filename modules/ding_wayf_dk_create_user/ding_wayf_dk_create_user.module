@@ -328,7 +328,7 @@ function ding_wayf_dk_create_user_form() {
     '#maxlength' => ding_user_get_pincode_length(),
     '#required' => TRUE,
     '#attributes' => array(
-      'autocomplete' => 'off',
+      'autocomplete' => 'new-password',
     ),
   );
 
